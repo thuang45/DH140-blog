@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/FinalProject.html",
+    "href": "posts/FinalProject.html",
+    "title": "TinaBlog",
+    "section": "",
+    "text": "title: “First File” description: “Testing Quarto” author: “Tina Huang” date: “03/10/2023” date-modified: “03/10/2023”"
+  },
+  {
+    "objectID": "posts/FinalProject.html#introduction",
+    "href": "posts/FinalProject.html#introduction",
+    "title": "TinaBlog",
+    "section": "Introduction",
+    "text": "Introduction\nFor my final project, I will be analyzing the 7 Harry Potter books by J.K. Rowling. The dataset can be found on Github. I wanted to analyze this data because I grew up reading the books and have a renewed interest since the game “Hogwarts Legacy” recently came out. I would be interested in seeing the differences across the 7 books, particularly analyzing the sentiment of the text and relationships of the characters."
+  },
+  {
+    "objectID": "posts/FinalProject.html#exploring-the-data",
+    "href": "posts/FinalProject.html#exploring-the-data",
+    "title": "TinaBlog",
+    "section": "Exploring the Data",
+    "text": "Exploring the Data\n\nData Preprocessing\n\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\ndef readTextFile(fileName):\n    fileString = \"\"\n    \n    with open(fileName, 'r') as f:\n        for line in f:\n            if not line.startswith(\"Page | \") and line.strip():\n                fileString += \" \" + line.strip()\n                \n    return fileString\n\nbook1_str = readTextFile(\"data/Book 1 - The Philosopher's Stone.txt\")\nbook2_str = readTextFile(\"data/Book 2 - The Chamber of Secrets.txt\")\nbook3_str = readTextFile(\"data/Book 3 - The Prisoner of Azkaban.txt\")\nbook4_str = readTextFile(\"data/Book 4 - The Goblet of Fire.txt\")\nbook5_str = readTextFile(\"data/Book 5 - The Order of the Phoenix.txt\")\nbook6_str = readTextFile(\"data/Book 6 - The Half Blood Prince.txt\")\nbook7_str = readTextFile(\"data/Book 7 - The Deathly Hallows.txt\")\n\nbook_dict = {\"The Philosopher's Stone\": book1_str, \n             \"The Chamber of Secrets\": book2_str, \n             \"The Prisoner of Azkaban\": book3_str, \n             \"The Goblet of Fire\": book4_str, \n             \"The Order of the Phoenix\": book5_str, \n             \"The Half Blood Prince\": book6_str, \n             \"The Deathly Hallows\": book7_str}\n\nThere are 7 total books I am analyzing. The original data had random line breaks in the middle of sentences due to how the book was printed, so I read in each book’s data as one entire sentence. There were also random lines, like “Page | 3 Harry Potter and the Philosophers Stone - J.K. Rowling” that indicated the header of a new page. This information was unnecessary, so I cleaned the data by removing those lines.\n\n\nWork Count Per Book\n\n# find the word count per book\nwordCounts = []\nfor bookStr in book_dict.values():\n    count = len(bookStr.split())\n    wordCounts.append(count)\n\n# plot word counts\nfig, ax = plt.subplots(figsize = (16,9))\nplt.bar(book_dict.keys(), wordCounts)\n\nplt.xlabel(\"Book Title\")\nplt.ylabel(\"Number of Words\")\nplt.title(\"Word Counts for Harry Potter Books\")\n\nText(0.5, 1.0, 'Word Counts for Harry Potter Books')\n\n\n\n\n\nThis graph of word counts shows how the first book, “The Philospher’s Stone”, has the shorted word count, while the fifth book, “The Order of the Phoenix”, has the greatest word count. There is a general increase in word count looking at the book chronologically.\n\n\nMost Common Words\n\nfrom string import punctuation\nimport nltk\nfrom nltk.tokenize import sent_tokenize\nfrom nltk.corpus import stopwords\nnltk.download('stopwords')\n\nmyStopWords = stopwords.words('english') + list(punctuation)\n\n\n# remove stopwords in \"The Philospher's Stone\"\nbook1_wordsNoStop = [w for w in book1_str.split() if w not in myStopWords]\n\n# most common words\nbook1_freq_words = nltk.FreqDist(book1_wordsNoStop).most_common(10)\nx, y = zip(*book1_freq_words)\nx = reversed(x)\ny = reversed(y)\nplt.barh(list(x), list(y))\nplt.xlabel(\"Frequency\")\nplt.ylabel(\"Words\")\nplt.title(\"Most Common Words in 'The Philosopher's Stone'\")\n\nText(0.5, 1.0, \"Most Common Words in 'The Philosopher's Stone'\")\n\n\n\n\n\n\n# remove stopwords in \"The Deathly Hallows\"\nbook7_wordsNoStop = [w for w in book7_str.split() if w not in myStopWords]\n\n# most common words\nbook7_freq_words = nltk.FreqDist(book7_wordsNoStop).most_common(10)\nx, y = zip(*book7_freq_words)\nx = reversed(x)\ny = reversed(y)\nplt.barh(list(x), list(y))\nplt.xlabel(\"Frequency\")\nplt.ylabel(\"Words\")\nplt.title(\"Most Common Words in 'The Deathly Hallows'\")\n\nText(0.5, 1.0, \"Most Common Words in 'The Deathly Hallows'\")\n\n\n\n\n\nThe most common words in the first and last Harry Potter books are pretty similar. “Harry” is the most common word for both; Hagrid is only one of the top 10 most common words in book 1, whereas “Hermione” becomes one of the top 10 most common words in book 7.\n\n\nWord Frequencies\n\nx = book1_str.split()\n\ndf = pd.DataFrame({'words': nltk.FreqDist(x).keys(),\n                  'frequencies': nltk.FreqDist(x).values()})\n\ndf['frequencies'].plot(kind='hist',bins=100)\nplt.xlim([0, 300])\nplt.xlabel(\"Word Frequencies\")\nplt.title(\"Frequency of Word Frequencies in 'The Philosopher's Stone'\")\n\nText(0.5, 1.0, \"Frequency of Word Frequencies in 'The Philosopher's Stone'\")\n\n\n\n\n\n\nx = book7_str.split()\n\ndf = pd.DataFrame({'words': nltk.FreqDist(x).keys(),\n                  'frequencies': nltk.FreqDist(x).values()})\n\ndf['frequencies'].plot(kind='hist',bins=100)\nplt.xlim([0, 500])\nplt.xlabel(\"Word Frequencies\")\nplt.title(\"Frequency of Word Frequencies in 'The Deathly Hallows'\")\n\nText(0.5, 1.0, \"Frequency of Word Frequencies in 'The Deathly Hallows'\")\n\n\n\n\n\nLooking at the word frequencies in the last book versus the first book, the distribution is generally the same with almost all words occuring infrequently, and only a few words occuring extremely frequently. The difference in the max word frequencies is because “The Deathly Hallows” has almost twice the word count than “The Philosopher’Stone”."
+  },
+  {
+    "objectID": "posts/FinalProject.html#analysis-of-the-data",
+    "href": "posts/FinalProject.html#analysis-of-the-data",
+    "title": "TinaBlog",
+    "section": "Analysis of the Data",
+    "text": "Analysis of the Data\nI am planning on analyzing the sentiment analysis of the books, along with creating network graphs of the characters’ relationships.\nThe sentiment analysis can analyze the top 10 positive words and top 10 negative words of each book. I could also map the general sentiment analysis over the course of each book by taking sections of 100 words and calculating the average sentiment for each section.\nI would create network graphs of the characters’ relationships by counting the frequencies of interactions between characters. This may be difficult because it’s not a play, but I could see if 2 characters’ names occur within 10 words of each other and count that as an interaction. Then, I would create a network graph with these character interactions.\n\nSentiment Analysis\n\nimport nltk\nfrom nltk.tokenize import word_tokenize\nfrom nltk.sentiment import vader\nfrom nltk.corpus import stopwords\nfrom nltk.corpus import opinion_lexicon\nfrom nltk.stem.porter import PorterStemmer\n\nnltk.download('punkt')\nnltk.download('stopwords')\nnltk.download('vader_lexicon')\nnltk.download('opinion_lexicon')\n\nsia = vader.SentimentIntensityAnalyzer()\n\n[nltk_data] Downloading package punkt to /home/jovyan/nltk_data...\n[nltk_data]   Package punkt is already up-to-date!\n[nltk_data] Downloading package stopwords to /home/jovyan/nltk_data...\n[nltk_data]   Package stopwords is already up-to-date!\n[nltk_data] Downloading package vader_lexicon to\n[nltk_data]     /home/jovyan/nltk_data...\n[nltk_data]   Package vader_lexicon is already up-to-date!\n[nltk_data] Downloading package opinion_lexicon to\n[nltk_data]     /home/jovyan/nltk_data...\n[nltk_data]   Package opinion_lexicon is already up-to-date!\n\n\n\n# analyzing book 1\npos_words = []\nneg_words = []\n\nfor word in book1_str.split():\n  comp_score = sia.polarity_scores(word)['compound']\n  if comp_score > 0:\n    pos_words.append(word)\n  elif comp_score < 0:\n    neg_words.append(word)\n\n\npos_items = nltk.FreqDist(pos_words).most_common(15)\nx, y = zip(*pos_items)\nx = reversed(x)\ny = reversed(y)\nplt.barh(list(x), list(y))\nplt.xlabel(\"Frequency\")\nplt.ylabel(\"Words\")\nplt.title(\"Most Common Positive words in 'The Philosopher's Stone'\")\n\nText(0.5, 1.0, \"Most Common Positive words in 'The Philosopher's Stone'\")\n\n\n\n\n\n\nneg_items = nltk.FreqDist(neg_words).most_common(15)\nx, y = zip(*neg_items)\nx = reversed(x)\ny = reversed(y)\nplt.barh(list(x), list(y))\nplt.xlabel(\"Frequency\")\nplt.ylabel(\"Words\")\nplt.title(\"Most Common Negative words in 'The Philosopher's Stone'\")\n\nText(0.5, 1.0, \"Most Common Negative words in 'The Philosopher's Stone'\")\n\n\n\n\n\n\n\nNetwork Visualization\n\nimport networkx as nx\nfrom bokeh.io import output_notebook, show, save\nfrom bokeh.models import Range1d, Circle, ColumnDataSource, MultiLine, EdgesAndLinkedNodes, NodesAndLinkedEdges, LabelSet\nfrom bokeh.plotting import figure\nfrom bokeh.plotting import from_networkx\nfrom bokeh.palettes import Blues8, Reds8, Purples8, Oranges8, Viridis8, Spectral8\nfrom bokeh.transform import linear_cmap\nfrom networkx.algorithms import community\n\n\n# create a dictionary that maps the frequency of characters' interactions\n# represents a bidirectional relationship between character names to the frequency of their interactions\n\nchar_dict = {}\n# TODO: create list of character names \nprev_char = \"harry potter\"\n\n# for word in words:\n#   if word in char_names and word != prev_char:\n#     if (prev_char, word) in char_dict:\n#       char_dict[(prev_char, word)] += 1\n#     elif (word, prev_char) in char_dict:\n#       char_dict[(word, prev_char)] += 1\n#     else:\n#       char_dict[(prev_char, word)] = 1\n#     prev_char = word\n\n# # convert to a dataframe\n# tuples = char_dict.keys()\n# df = pd.DataFrame({'Source': [tuple[0] for tuple in tuples],\n#                    'Target': [tuple[1] for tuple in tuples],\n#                    'Weight': char_dict.values()})\n# df.head()"
+  },
+  {
+    "objectID": "posts/FinalProject.html#resources",
+    "href": "posts/FinalProject.html#resources",
+    "title": "TinaBlog",
+    "section": "Resources",
+    "text": "Resources\nSome resources that I’ve used/may look at: * Text Analysis Medium Article * Sentiment Analysis * Kaggle Data Analysis"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "TinaBlog",
+    "section": "",
+    "text": "—\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nPost With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nMar 11, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n  \n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nMar 8, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+  }
+]
